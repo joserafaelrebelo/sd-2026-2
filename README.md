@@ -58,61 +58,6 @@ Sistema distribuído de gestão, divisão inteligente e liquidação de despesas
 
 ---
 
-## 🚀 Como Executar
-
-### 1. Inicialização Completa (Tudo em Um Comando)
-
-Para subir o banco de dados PostgreSQL, os 2 microsserviços gRPC e o API Gateway Spring Boot:
-
-```bash
-./run-all.sh
-```
-
-Acesse a interface no seu navegador:
-👉 **[http://localhost:8080](http://localhost:8080)**
-
----
-
-### 2. Suíte de Testes Automatizados End-to-End
-
-Com o sistema rodando, execute o script de validação de todos os requisitos de entrega:
-
-```bash
-./test-api.sh
-```
-
-O script testará automaticamente:
-- ❌ Bloqueio na borda sem token (`401 Unauthorized`)
-- ❌ Validação de payload inválido (`400 Bad Request`)
-- ✅ Registro de novos usuários com senha criptografada (`201 Created`)
-- ✅ Autenticação e geração de token JWT
-- ✅ Criação de grupo via gRPC Usuários & Grupos (`201 Created`)
-- ✅ Registro de despesas via gRPC Finanças (`201 Created`)
-- ✅ Cálculo do extrato e algoritmo de dívidas simplificadas
-- ✅ Quitação de dívida (Settle Up) com reflexo no banco (`200 OK`)
-
----
-
-### 3. Execução Individual dos Componentes
-
-Caso deseje executar os serviços em terminais separados:
-
-```bash
-# Terminal 1: Banco de Dados PostgreSQL
-./start-db.sh
-
-# Terminal 2: Microsserviço de Usuários & Grupos (gRPC :50051)
-./run-usergroup.sh
-
-# Terminal 3: Microsserviço de Finanças (gRPC :50052)
-./run-finance.sh
-
-# Terminal 4: API Gateway Spring Boot (REST + JWT :8080)
-./run-gateway.sh
-```
-
----
-
 ## 📁 Estrutura do Repositório
 
 ```text
@@ -149,11 +94,5 @@ sd-2026-2/
 │       └── db/ (PostgresManager, FinanceRepository)
 ├── docker-compose.yml             # Container PostgreSQL 16
 ├── init-db.sql                    # Inicialização dos bancos rateio_users e rateio_finance
-├── start-db.sh                    # Script para subir o banco
-├── run-usergroup.sh               # Script de execução do Microsserviço 1
-├── run-finance.sh                 # Script de execução do Microsserviço 2
-├── run-gateway.sh                 # Script de execução do API Gateway
-├── run-all.sh                     # Orquestrador unificado
-├── test-api.sh                    # Testes automatizados de conformidade
 └── README.md
 ```
