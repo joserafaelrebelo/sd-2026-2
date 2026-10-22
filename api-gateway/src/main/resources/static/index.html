@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RATE.IO - Gestão Inteligente de Despesas</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Tela / Card de Autenticação (quando não autenticado) -->
+  <div id="authView" class="auth-view-container" style="display: none;">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo-icon-lg">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <h2>RATE.<span>IO</span></h2>
+        <p class="subtitle">Divisão justa e inteligente de despesas em grupo</p>
+      </div>
+
+      <!-- Abas Login / Registro -->
+      <div class="auth-tabs">
+        <button id="tabLogin" class="tab-btn active" type="button">Entrar</button>
+        <button id="tabRegister" class="tab-btn" type="button">Criar Conta</button>
+      </div>
+
+      <!-- Formulário de Login -->
+      <form id="formLogin" class="auth-form">
+        <div class="form-group">
+          <label for="loginUserId">Identificador (Username/ID)</label>
+          <input type="text" id="loginUserId" placeholder="Ex: alice" required class="form-input" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Senha</label>
+          <input type="password" id="loginPassword" placeholder="Sua senha" required class="form-input" autocomplete="current-password">
+        </div>
+        <div id="loginError" class="alert-error" style="display: none;"></div>
+        <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+        <p class="auth-hint">Acesse sua conta ou crie um cadastro para começar.</p>
+      </form>
+
+      <!-- Formulário de Registro -->
+      <form id="formRegister" class="auth-form" style="display: none;">
+        <div class="form-group">
+          <label for="regUserId">Identificador de Usuário (ID único)</label>
+          <input type="text" id="regUserId" placeholder="Ex: daniel" required class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="regName">Nome Completo</label>
+          <input type="text" id="regName" placeholder="Ex: Daniel Souza" required class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Senha de Acesso</label>
+          <input type="password" id="regPassword" placeholder="Mínimo 4 caracteres" required class="form-input" autocomplete="new-password">
+        </div>
+        <div id="regError" class="alert-error" style="display: none;"></div>
+        <div id="regSuccess" class="alert-success" style="display: none;"></div>
+        <button type="submit" class="btn btn-primary btn-block">Registrar e Autenticar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Layout Principal (quando autenticado) -->
+  <div id="mainAppView" class="app-layout" style="display: none;">
+    <!-- Barra Superior -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>RATE.<span>IO</span></h1>
+          <p class="subtitle">Divisão inteligente de despesas em grupo</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="group-picker-container">
+          <label for="groupSelect">Grupo:</label>
+          <select id="groupSelect" class="select-input"></select>
+          <button id="btnOpenNewGroup" class="btn btn-secondary btn-sm">+ Novo Grupo</button>
+        </div>
+
+        <div class="user-badge-container">
+          <span class="user-badge" id="userBadgeLabel">👤 Conectado</span>
+          <button id="btnLogout" class="btn btn-ghost btn-sm" title="Sair da sessão">Sair</button>
+        </div>
+
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span class="status-text">Online</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+      <!-- Seção de Ações e Resumo do Grupo -->
+      <section class="group-hero">
+        <div class="hero-info">
+          <h2 id="currentGroupName">Carregando...</h2>
+          <p id="currentGroupMembers" class="members-text">Membros: ...</p>
+        </div>
+        <div class="hero-actions">
+          <button id="btnOpenAddExpense" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Nova Despesa
+          </button>
+          <button id="btnOpenSettle" class="btn btn-outline">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Quitar Dívida (Settle)
+          </button>
+        </div>
+      </section>
+
+      <!-- Métricas / Cards de Resumo -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-label">Total Gasto no Grupo</span>
+          <span id="metricTotalExpenses" class="metric-value">R$ 0,00</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Dívidas Pendentes</span>
+          <span id="metricDebtsCount" class="metric-value">0</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Participantes</span>
+          <span id="metricMembersCount" class="metric-value">0</span>
+        </div>
+      </div>
+
+      <!-- Grid de 2 Colunas: Dívidas Simplificadas vs Extrato -->
+      <div class="dashboard-grid">
+        <!-- Coluna 1: Dívidas Simplificadas (Quem deve para quem) -->
+        <div class="card panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <h3>Dívidas Simplificadas</h3>
+              <span class="badge badge-accent" title="Calculado de forma simplificada e justa">Otimizado</span>
+            </div>
+            <p class="panel-subtitle">Menor número possível de transações para quitar o grupo.</p>
+          </div>
+          <div id="debtsList" class="debts-container">
+            <div class="empty-state">Nenhuma dívida pendente. O grupo está quitado!</div>
+          </div>
+        </div>
+
+        <!-- Coluna 2: Extrato de Despesas -->
+        <div class="card panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <h3>Histórico de Despesas</h3>
+            </div>
+            <p class="panel-subtitle">Histórico cronológico de lançamentos e divisões.</p>
+          </div>
+          <div id="expensesList" class="expenses-container">
+            <div class="empty-state">Nenhuma despesa registrada neste grupo.</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="app-footer">
+      <p>RATE.IO &bull; Gestão Inteligente de Despesas em Grupo</p>
+    </footer>
+  </div>
+
+  <!-- Modal: Nova Despesa -->
+  <dialog id="modalExpense" class="modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Registrar Nova Despesa</h3>
+        <button type="button" class="btn-close" onclick="document.getElementById('modalExpense').close()">&times;</button>
+      </div>
+      <form id="formExpense" class="modal-form">
+        <div class="form-group">
+          <label for="expDesc">Descrição</label>
+          <input type="text" id="expDesc" placeholder="Ex: Jantar, Hospedagem, Mercado" required class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="expAmount">Valor Total (R$)</label>
+          <input type="number" id="expAmount" step="0.01" min="0.01" placeholder="0.00" required class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="expPaidBy">Quem pagou?</label>
+          <select id="expPaidBy" required class="form-input"></select>
+        </div>
+        <div class="form-group">
+          <label>Dividir igualmente entre:</label>
+          <div id="expParticipantsList" class="checkbox-group"></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('modalExpense').close()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Despesa</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Modal: Quitar Dívida (Settle Up) -->
+  <dialog id="modalSettle" class="modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Quitar Dívida (Settle Up)</h3>
+        <button type="button" class="btn-close" onclick="document.getElementById('modalSettle').close()">&times;</button>
+      </div>
+      <form id="formSettle" class="modal-form">
+        <div class="form-group">
+          <label for="settleFrom">Quem está pagando? (Devedor)</label>
+          <select id="settleFrom" required class="form-input"></select>
+        </div>
+        <div class="form-group">
+          <label for="settleTo">Quem está recebendo? (Credor)</label>
+          <select id="settleTo" required class="form-input"></select>
+        </div>
+        <div class="form-group">
+          <label for="settleAmount">Valor a Pagar (R$)</label>
+          <input type="number" id="settleAmount" step="0.01" min="0.01" placeholder="0.00" required class="form-input">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('modalSettle').close()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Registrar Pagamento</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Modal: Novo Grupo -->
+  <dialog id="modalGroup" class="modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Criar Novo Grupo</h3>
+        <button type="button" class="btn-close" onclick="document.getElementById('modalGroup').close()">&times;</button>
+      </div>
+      <form id="formGroup" class="modal-form">
+        <div class="form-group">
+          <label for="grpId">ID do Grupo (sem espaços)</label>
+          <input type="text" id="grpId" placeholder="ex: viagem-praia" required class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="grpName">Nome do Grupo</label>
+          <input type="text" id="grpName" placeholder="ex: Viagem à Praia" required class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="grpMembers">Membros (separados por vírgula)</label>
+          <input type="text" id="grpMembers" placeholder="ex: alice, bob, carol" required class="form-input">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('modalGroup').close()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Criar Grupo</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
